@@ -1,0 +1,5 @@
+*.pyc
+*.csv
+/.idea/.name
+/.idea/Futures_Predictor.iml
+/.ipynb_checkpoints/Futures_Predictor_Project_Report-checkpoint.ipynb
