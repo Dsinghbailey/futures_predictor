@@ -17,11 +17,11 @@ def pca_svm_acc(mds):
     X_train = train.drop('Up', axis=1)
     y_test = test['Up']
     X_test = test.drop('Up', axis=1)
-    clf = PCA(n_components=8, whiten=True)
-    X_train_pca = clf.fit_transform(X_train)
+    pre = PCA(n_components=8, whiten=True)
+    X_train_pca = pre.fit_transform(X_train)
+    X_test_pca = pre.fit_transform(X_test)
     clf = SVC()
     clf.fit(X_train_pca, y_train)
-    X_test_pca = clf.fit_transform(X_test)
     y_guess = clf.predict(X_test_pca)
     return accuracy_score(y_test, y_guess)
 
