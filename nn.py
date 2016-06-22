@@ -128,4 +128,3 @@ def feature_scaled_nn_acc(mds, type):
     y_guess = model.predict_classes(X_test_pca)
     y_guess = to_categorical(y_guess)
     return accuracy_score(y_test, y_guess)
-
