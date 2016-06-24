@@ -96,7 +96,7 @@ def get_full_mds():
     # Remove perfect knowledge
     mds.drop(['Close', 'High', 'Low', 'Volume'], axis=1, inplace=True)
 
-    return mds
+     return mds
 
 
 def get_scaled_mds():

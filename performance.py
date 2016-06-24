@@ -7,7 +7,6 @@ from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 from nn import nn_acc
-from keras.utils.np_utils import to_categorical
 
 
 # Helper

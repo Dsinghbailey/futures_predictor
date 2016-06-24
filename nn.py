@@ -78,32 +78,32 @@ def nn_acc(mds, type, epoch=5, batch=16):
     mds = mds.drop('Market', axis=1)
     mds = mds.dropna()
     train = mds[(mds['DayIndex'] >= 400)]
-    test = mds[(mds['DayIndex'] < 400)]
+    validation = mds[(mds['DayIndex'] < 400)]
     # Multiply by 1 to convert to bool
     y_train = train['Up'] * 1
     X_train = train.drop('Up', axis=1)
-    y_test = test['Up'] * 1
-    X_test = test.drop('Up', axis=1)
+    y_validation = validation['Up'] * 1
+    X_validation = validation.drop('Up', axis=1)
     # Create Model
     model = create_model(X_train.shape[1], type)
     # Convert to Keras format
     X_train = (X_train).as_matrix()
-    X_test = (X_test).as_matrix()
+    X_validation = (X_validation).as_matrix()
     y_train = to_categorical(y_train.values)
-    y_test = to_categorical(y_test.values)
+    y_validation = to_categorical(y_validation.values)
     # Fit and guess
     model.fit(X_train, y_train, nb_epoch=epoch, batch_size=batch)
     guess_train = model.predict_classes(X_train)
     guess_train = to_categorical(guess_train)
 
-    guess_test = model.predict_classes(X_test)
-    guess_test = to_categorical(guess_test)
+    guess_validation = model.predict_classes(X_validation)
+    guess_validation = to_categorical(guess_validation)
 
     train_acc = accuracy_score(y_train, guess_train)
-    test_acc = accuracy_score(y_test, guess_test)
+    validation_acc = accuracy_score(y_validation, guess_validation)
     print "\n neural net train accuracy is {}".format(train_acc)
-    print "\n neural net test accuracy is {}".format(test_acc)
-    return guess_test
+    print "\n neural net validation accuracy is {}".format(validation_acc)
+    return guess_validation
 
 
 # Print accuracy return guess
@@ -113,33 +113,33 @@ def pca_nn_acc(mds, type):
     mds = mds.drop('Market', axis=1)
     mds = mds.dropna()
     train = mds[(mds['DayIndex'] >= 400)]
-    test = mds[(mds['DayIndex'] < 400)]
+    validation = mds[(mds['DayIndex'] < 400)]
     # Multiply by 1 to convert to bool
     y_train = train['Up'] * 1
     X_train = train.drop('Up', axis=1)
-    y_test = test['Up'] * 1
-    X_test = test.drop('Up', axis=1)
+    y_validation = validation['Up'] * 1
+    X_validation = validation.drop('Up', axis=1)
     pre = PCA(n_components=8, whiten=True)
     X_train_pca = pre.fit_transform(X_train)
-    X_test_pca = pre.fit_transform(X_test)
+    X_validation_pca = pre.fit_transform(X_validation)
     model = create_model(X_train_pca.shape[1], type)
     # Convert to Keras format
     y_train = to_categorical(y_train.values)
-    y_test = to_categorical(y_test.values)
+    y_validation = to_categorical(y_validation.values)
     model.fit(X_train_pca, y_train, nb_epoch=5, batch_size=16)
     time.sleep(0.1)
     # Fit and guess
     guess_train = model.predict_classes(X_train_pca)
     guess_train = to_categorical(guess_train)
 
-    guess_test = model.predict_classes(X_test_pca)
-    guess_test = to_categorical(guess_test)
+    guess_validation = model.predict_classes(X_validation_pca)
+    guess_validation = to_categorical(guess_validation)
 
     train_acc = accuracy_score(y_train, guess_train)
-    test_acc = accuracy_score(y_test, guess_test)
+    validation_acc = accuracy_score(y_validation, guess_validation)
     print "\n neural net train accuracy is {}".format(train_acc)
-    print "\n neural net test accuracy is {}".format(test_acc)
-    return guess_test
+    print "\n neural net validation accuracy is {}".format(validation_acc)
+    return guess_validation
 
 
 # Print accuracy return guess
@@ -149,30 +149,30 @@ def feature_scaled_nn_acc(mds, type):
     mds = mds.drop('Market', axis=1)
     mds = mds.dropna()
     train = mds[(mds['DayIndex'] >= 400)]
-    test = mds[(mds['DayIndex'] < 400)]
+    validation = mds[(mds['DayIndex'] < 400)]
     # Multiply by 1 to convert to bool
     y_train = train['Up'] * 1
     X_train = train.drop('Up', axis=1)
-    y_test = test['Up'] * 1
-    X_test = test.drop('Up', axis=1)
+    y_validation = validation['Up'] * 1
+    X_validation = validation.drop('Up', axis=1)
     pre = PCA(n_components=19, whiten=True)
     X_train_pca = pre.fit_transform(X_train)
-    X_test_pca = pre.fit_transform(X_test)
+    X_validation_pca = pre.fit_transform(X_validation)
     model = create_model(X_train_pca.shape[1], type)
     # Convert to Keras format
     y_train = to_categorical(y_train.values)
-    y_test = to_categorical(y_test.values)
+    y_validation = to_categorical(y_validation.values)
     model.fit(X_train_pca, y_train, nb_epoch=5, batch_size=16)
     time.sleep(0.1)
     # Fit and guess
     guess_train = model.predict_classes(X_train_pca)
     guess_train = to_categorical(guess_train)
 
-    guess_test = model.predict_classes(X_test_pca)
-    guess_test = to_categorical(guess_test)
+    guess_validation = model.predict_classes(X_validation_pca)
+    guess_validation = to_categorical(guess_validation)
 
     train_acc = accuracy_score(y_train, guess_train)
-    test_acc = accuracy_score(y_test, guess_test)
+    validation_acc = accuracy_score(y_validation, guess_validation)
     print "\n neural net train accuracy is {}".format(train_acc)
-    print "\n neural net test accuracy is {}".format(test_acc)
-    return guess_test
+    print "\n neural net validation accuracy is {}".format(validation_acc)
+    return guess_validation

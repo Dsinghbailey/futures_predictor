@@ -12,23 +12,23 @@ def pca_svm_acc(mds):
     mds = mds.drop('Market', axis=1)
     mds = mds.dropna()
     train = mds[(mds['DayIndex'] >= 400)]
-    test = mds[(mds['DayIndex'] < 400)]
+    validation = mds[(mds['DayIndex'] < 400)]
     y_train = train['Up']
     X_train = train.drop('Up', axis=1)
-    y_test = test['Up']
-    X_test = test.drop('Up', axis=1)
+    y_validation = validation['Up']
+    X_validation = validation.drop('Up', axis=1)
     pre = PCA(n_components=8, whiten=True)
     X_train_pca = pre.fit_transform(X_train)
-    X_test_pca = pre.fit_transform(X_test)
+    X_validation_pca = pre.fit_transform(X_validation)
     clf = SVC()
     clf.fit(X_train_pca, y_train)
     guess_train = clf.predict(X_train_pca)
-    guess_test = clf.predict(X_test_pca)
+    guess_validation = clf.predict(X_validation_pca)
     train_acc = accuracy_score(guess_train, y_train)
-    test_acc = accuracy_score(guess_test, y_test)
+    validation_acc = accuracy_score(guess_validation, y_validation)
     print "svm train accuracy is {}".format(train_acc)
-    print "svm test accuracy is {}".format(test_acc)
-    return train_acc, test_acc
+    print "svm validation accuracy is {}".format(validation_acc)
+    return train_acc, validation_acc
 
 
 
@@ -39,8 +39,8 @@ def batch_pca_svm_acc(mds):
     for mkt_name in mkt_names:
         print mkt_name
         mkt_mds = mds[(mds['Market'] == mkt_name)]
-        train_acc, test_acc = pca_svm_acc(mkt_mds)
-        acc_scores.append([train_acc, test_acc])
+        train_acc, validation_acc = pca_svm_acc(mkt_mds)
+        acc_scores.append([train_acc, validation_acc])
     return acc_scores
 
 
@@ -50,11 +50,11 @@ def pca_svm_cv_acc(mds):
     mds = mds.drop('Market', axis=1)
     mds = mds.dropna()
     train = mds[(mds['DayIndex'] >= 400)]
-    test = mds[(mds['DayIndex'] < 400)]
+    validation = mds[(mds['DayIndex'] < 400)]
     y_train = train['Up']
     X_train = train.drop('Up', axis=1)
-    y_test = test['Up']
-    X_test = test.drop('Up', axis=1)
+    y_validation = validation['Up']
+    X_validation = validation.drop('Up', axis=1)
     pipe = Pipeline(steps=[('pca', PCA()),
                            ('svc', SVC())])
     tuned_parameters = [{'pca__n_components': [4, 5, 7, 8, 10, 15]}]
@@ -64,8 +64,8 @@ def pca_svm_cv_acc(mds):
                        scoring='accuracy')
     clf.fit(X_train, y_train)
     guess_train = clf.predict(X_train)
-    guess_test = clf.predict(X_test)
+    guess_validation = clf.predict(X_validation)
     train_acc = accuracy_score(guess_train, y_train)
-    test_acc = accuracy_score(guess_test, y_test)
+    validation_acc = accuracy_score(guess_validation, y_validation)
     print "cv svm train accuracy is {}".format(train_acc)
-    print "cv svm test accuracy is {}".format(test_acc)
+    print "cv svm validation accuracy is {}".format(validation_acc)
