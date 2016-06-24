@@ -6,7 +6,7 @@ from sklearn.svm import SVC
 from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
-from nn import create_model
+from nn import nn_acc
 from keras.utils.np_utils import to_categorical
 
 
@@ -108,41 +108,12 @@ def draw_pca_svm_cv(train_mds, test_mds):
     print "\naverage PNL %s" % np.mean(pnls)
 
 
-# Helper for Equity curve for 2 layer nn
-# Takes full mds
-def nn_guess(mds, epoch=5, batch=16):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    test = mds[(mds['DayIndex'] < 400)]
-    # Multiply by 1 to convert to bool
-    y_train = train['Up'] * 1
-    X_train = train.drop('Up', axis=1)
-    y_test = test['Up'] * 1
-    X_test = test.drop('Up', axis=1)
-
-    model = create_model(X_train.shape[1], '2layer')
-
-    # Convert to Keras format
-    X_train = (X_train).as_matrix()
-    X_test = (X_test).as_matrix()
-    y_train = to_categorical(y_train.values)
-    y_test = to_categorical(y_test.values)
-    model.fit(X_train, y_train, nb_epoch=epoch, batch_size=batch)
-    y_guess = model.predict_classes(X_test)
-    y_guess = to_categorical(y_guess)
-    print "accuracy is {}".format(accuracy_score(y_test, y_guess))
-    return y_guess
-
-
-# 2layer nn
-def draw_nn(train_mds, test_mds):
+# nn
+def draw_nn(train_mds, test_mds, type):
     mkt_names = list(train_mds.Market.unique())
     pnls = []
     test_mds = test_mds[(test_mds['DayIndex'] < 400)].copy(deep=True)
-    y_guess = nn_guess(train_mds)
+    y_guess = nn_acc(train_mds, type) 
     test_mds['y_guess'] = y_guess[:, 1]
     # Convert 0 to -1 for shorting
     test_mds['y_guess'].replace(to_replace=0, value=-1, inplace=True)

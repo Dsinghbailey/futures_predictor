@@ -19,16 +19,23 @@ def svm_acc(mds, kernel):
     X_test = test.drop('Up', axis=1)
     clf = svm.SVC(kernel=kernel)
     clf.fit(X_train, y_train)
-    y_guess = clf.predict(X_test)
-    return accuracy_score(y_test, y_guess)
+    guess_train = clf.predict(X_train)
+    guess_test = clf.predict(X_test)
+    train_acc = accuracy_score(guess_train, y_train)
+    test_acc = accuracy_score(guess_test, y_test)
+    print "svm train accuracy is {}".format(train_acc)
+    print "svm test accuracy is {}".format(test_acc)
+    return train_acc, test_acc
 
 
 def batch_svm_acc(mds, kernel):
     mkt_names = list(mds.Market.unique())
     acc_scores = []
     for mkt_name in mkt_names:
+        print mkt_name
         mkt_mds = mds[(mds['Market'] == mkt_name)]
-        acc_scores.append(svm_acc(mkt_mds, kernel))
+        train_acc, test_acc = svm_acc(mkt_mds, 'rbf')
+        acc_scores.append([train_acc, test_acc])
     return acc_scores
 
 
@@ -36,7 +43,9 @@ def gridsearch_svm(mds):
     mkt_names = list(mds.Market.unique())
     acc_scores = []
     mds = mds.dropna()
+    print "BATCH DATA"
     for mkt_name in mkt_names:
+        print mkt_name
         mkt_mds = mds[(mds['Market'] == mkt_name)]
         mkt_mds = mkt_mds.copy(deep=True)
         mkt_mds.drop('Market', axis=1, inplace=True)
@@ -53,7 +62,11 @@ def gridsearch_svm(mds):
                            cv=3,
                            scoring='accuracy')
         clf.fit(X_train, y_train)
-        y_guess = clf.predict(X_test)
-        acc_scores.append(accuracy_score(y_test, y_guess))
-
+        guess_train = clf.predict(X_train)
+        guess_test = clf.predict(X_test)
+        train_acc = accuracy_score(guess_train, y_train)
+        test_acc = accuracy_score(guess_test, y_test)
+        print "PCA svm train accuracy is {}".format(train_acc)
+        print "PCA svm test accuracy is {}".format(test_acc)
+        acc_scores.append([train_acc, test_acc])
     return acc_scores
