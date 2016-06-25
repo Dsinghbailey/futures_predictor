@@ -3,12 +3,15 @@ import time
 from datetime import datetime
 
 
+# Helper function for Dataframe Fetching
+# Contains basic Market Daily Summaries
 def get_mds():
     # Read
     mds = pd.read_csv('DailySummaries.csv')
 
     # Select columns
-    mds = mds[['Date', 'Market', 'Open', 'High', 'Low', 'Close', 'Volume', 'ATR10']]
+    mds = mds[['Date', 'Market', 'Open', 'High',
+               'Low', 'Close', 'Volume', 'ATR10']]
 
     # Drop some markets
     mds = mds[(mds['Market'] != 'VX') & (mds['Market'] != 'FOAT')]
@@ -57,10 +60,10 @@ def get_mds():
     mds['Open'].fillna(mds['Close'], inplace=True)
     mds['High'].fillna(mds['Close'], inplace=True)
     mds['Low'].fillna(mds['Close'], inplace=True)
-
     return mds
 
 
+# Simple market daily summaries for graphing
 def get_simple_mds():
     mds = get_mds()
 
@@ -69,14 +72,12 @@ def get_simple_mds():
     return mds
 
 
+# Market Daily summaries with all information but no perfect knowledge
 def get_full_mds():
-
     mds = get_mds()
-
     # Select Columns
     mds = mds[['Market', 'DayIndex', 'Open', 'High',
                'Low', 'Close', 'Volume', 'ATR10']]
-
     # Add Features
     mds['YOpen'] = mds.groupby(by='Market')['Open'].shift(1)
     mds['YHigh'] = mds.groupby(by='Market')['High'].shift(1)
@@ -89,16 +90,14 @@ def get_full_mds():
     mds['OpenMA10'] = (mds['Open'] - mds['Open'].rolling(window=10, min_periods=1).mean())/mds['ATR10']
     mds['OpenMA30'] = (mds['Open'] - mds['Open'].rolling(window=30, min_periods=1).mean())/mds['ATR10']
     mds['OpenMA50'] = (mds['Open'] - mds['Open'].rolling(window=50, min_periods=1).mean())/mds['ATR10']
-
     # Add labels
     mds['Up'] = (mds['Close'] - mds['Open']) > 0
-
     # Remove perfect knowledge
     mds.drop(['Close', 'High', 'Low', 'Volume'], axis=1, inplace=True)
+    return mds
 
-     return mds
 
-
+# Market Daily summaries only with Features scaled By volatility
 def get_scaled_mds():
     mds = get_full_mds()
     mds = mds[['Market', 'DayIndex', 'Gap', 'YChange', 'YRange',
@@ -106,6 +105,7 @@ def get_scaled_mds():
     return mds
 
 
+# MDS with Perfect knowlege for graphing
 def get_test_mds():
     mds = get_mds()
     # Select Columns
@@ -117,9 +117,26 @@ def get_test_mds():
     mds = mds.dropna()
     # Add labels
     mds['Up'] = (mds['Close'] - mds['Open']) > 0
-
-    # Remove perfect knowledge
     return mds
+
+
+# Function to remove last 400 days for training and validation
+def remove_test(mds):
+    fin = mds['DayIndex'].max()
+    train = mds[mds['DayIndex'] < fin - 400]
+    return train
+
+
+# Split your data. Last 400 for validation
+def validation_split(mds):
+    mkt_dummies = pd.get_dummies(mds['Market'])
+    mds = pd.concat([mds, mkt_dummies], axis=1)
+    mds = mds.drop('Market', axis=1)
+    mds = mds.dropna()
+    fin = mds['DayIndex'].max()
+    train = mds[mds['DayIndex'] < fin - 400]
+    validation = mds[mds['DayIndex'] >= fin - 400]
+    return train, validation
 
 
 # Unit Test

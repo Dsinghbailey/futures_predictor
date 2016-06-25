@@ -1,18 +1,10 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-import pandas as pd
+from Preprocessor import validation_split
 
 
 def random_forest_acc(mds):
-    # Add dummies for market
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-
-    # Split train and validation
-    mds = mds.dropna()
-    train = mds[mds['DayIndex'] >= 400]
-    validation = mds[mds['DayIndex'] < 400]
+    train, validation = validation_split(mds)
     y_train = train['Up']
     X_train = train.drop('Up', axis=1)
     y_validation = validation['Up']

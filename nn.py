@@ -1,10 +1,10 @@
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
-import pandas as pd
 from sklearn.metrics import accuracy_score
 from keras.utils.np_utils import to_categorical
 from sklearn.decomposition import PCA
 import time
+from Preprocessor import validation_split
 
 
 def create_model(input_size, type):
@@ -73,12 +73,7 @@ def create_model(input_size, type):
 
 # Print accuracy, return guess
 def nn_acc(mds, type, epoch=5, batch=16):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    validation = mds[(mds['DayIndex'] < 400)]
+    train, validation = validation_split(mds)
     # Multiply by 1 to convert to bool
     y_train = train['Up'] * 1
     X_train = train.drop('Up', axis=1)
@@ -108,12 +103,7 @@ def nn_acc(mds, type, epoch=5, batch=16):
 
 # Print accuracy return guess
 def pca_nn_acc(mds, type):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    validation = mds[(mds['DayIndex'] < 400)]
+    train, validation = validation_split(mds)
     # Multiply by 1 to convert to bool
     y_train = train['Up'] * 1
     X_train = train.drop('Up', axis=1)
@@ -144,12 +134,7 @@ def pca_nn_acc(mds, type):
 
 # Print accuracy return guess
 def feature_scaled_nn_acc(mds, type):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    validation = mds[(mds['DayIndex'] < 400)]
+    train, validation = validation_split(mds)
     # Multiply by 1 to convert to bool
     y_train = train['Up'] * 1
     X_train = train.drop('Up', axis=1)

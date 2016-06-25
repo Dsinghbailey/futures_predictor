@@ -1,18 +1,13 @@
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
-import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
+from Preprocessor import validation_split
 
 
 def pca_svm_acc(mds):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    validation = mds[(mds['DayIndex'] < 400)]
+    train, validation = validation_split(mds)
     y_train = train['Up']
     X_train = train.drop('Up', axis=1)
     y_validation = validation['Up']
@@ -31,7 +26,6 @@ def pca_svm_acc(mds):
     return train_acc, validation_acc
 
 
-
 def batch_pca_svm_acc(mds):
     mkt_names = list(mds.Market.unique())
     acc_scores = []
@@ -45,12 +39,7 @@ def batch_pca_svm_acc(mds):
 
 
 def pca_svm_cv_acc(mds):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    validation = mds[(mds['DayIndex'] < 400)]
+    train, validation = validation_split(mds)
     y_train = train['Up']
     X_train = train.drop('Up', axis=1)
     y_validation = validation['Up']

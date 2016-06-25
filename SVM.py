@@ -2,17 +2,12 @@
 from sklearn import svm
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
-import pandas as pd
 from sklearn.grid_search import GridSearchCV
+from Preprocessor import validation_split
 
 
 def svm_acc(mds, kernel):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    validation = mds[(mds['DayIndex'] < 400)]
+    train, validation = validation_split(mds)
     y_train = train['Up']
     X_train = train.drop('Up', axis=1)
     y_validation = validation['Up']
@@ -46,11 +41,7 @@ def gridsearch_svm(mds):
     print "BATCH DATA"
     for mkt_name in mkt_names:
         print mkt_name
-        mkt_mds = mds[(mds['Market'] == mkt_name)]
-        mkt_mds = mkt_mds.copy(deep=True)
-        mkt_mds.drop('Market', axis=1, inplace=True)
-        train = mkt_mds[(mkt_mds['DayIndex'] >= 400)]
-        validation = mkt_mds[(mkt_mds['DayIndex'] < 400)]
+        train, validation = validation_split(mds)
         y_train = train['Up']
         X_train = train.drop('Up', axis=1)
         y_validation = validation['Up']
