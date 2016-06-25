@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
-import pandas as pd
 import numpy as np
 from sklearn.svm import SVC
 from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 from nn import nn_acc
+from Preprocessor import validation_split
 
 
 # Helper
@@ -21,7 +21,7 @@ def draw_eq_curve(mkt, eq_curve):
     ax.autoscale_view()
     plt.plot(eq_curve)
     plt.show()
-    pnl = eq_curve.iloc[-1] - eq_curve[0]
+    pnl = eq_curve.iloc[-1] - eq_curve.iloc[0]
     print ("\npnl = %s" % pnl)
     pnl_min = 1 - eq_curve.min()/1000
     print ("max loss since inception = {:04.2f}%".format(pnl_min)) 
@@ -36,7 +36,8 @@ def draw_long_only(mds):
     for mkt_name in mkt_names:
         mkt_mds = mds[(mds['Market'] == mkt_name)]
         mkt_mds.reset_index(inplace=True)
-        mkt_mds = mkt_mds[(mkt_mds['DayIndex'] < 400)]
+        fin = mkt_mds['DayIndex'].max()
+        mkt_mds = mkt_mds[mkt_mds['DayIndex'] >= fin - 400].copy(deep=True)
         # Sums for managed account
         mkt_mds.eq_change = mkt_mds['Change']*1000
         mkt_mds.eq_curve = 1000 + mkt_mds.eq_change.rolling(window=400, min_periods=1).sum()
@@ -52,7 +53,8 @@ def draw_short_only(mds):
     for mkt_name in mkt_names:
         mkt_mds = mds[(mds['Market'] == mkt_name)]
         mkt_mds.reset_index(inplace=True)
-        mkt_mds = mkt_mds[(mkt_mds['DayIndex'] < 400)]
+        fin = mkt_mds['DayIndex'].max()
+        mkt_mds = mkt_mds[mkt_mds['DayIndex'] >= fin - 400].copy(deep=True)
         # Sums for managed account
         mkt_mds.eq_change = mkt_mds['Change']*-1000
         mkt_mds.eq_curve = 1000 + mkt_mds.eq_change.rolling(window=400, min_periods=1).sum()
@@ -63,12 +65,7 @@ def draw_short_only(mds):
 # Helper for Equity curve for pca_svm
 # Takes full mds
 def pca_svm_cv_guess(mds):
-    mkt_dummies = pd.get_dummies(mds['Market'])
-    mds = pd.concat([mds, mkt_dummies], axis=1)
-    mds = mds.drop('Market', axis=1)
-    mds = mds.dropna()
-    train = mds[(mds['DayIndex'] >= 400)]
-    test = mds[(mds['DayIndex'] < 400)]
+    train, test = validation_split(mds)
     y_train = train['Up']
     X_train = train.drop('Up', axis=1)
     y_test = test['Up']
@@ -91,7 +88,8 @@ def pca_svm_cv_guess(mds):
 def draw_pca_svm_cv(train_mds, test_mds):
     mkt_names = list(train_mds.Market.unique())
     pnls = []
-    test_mds = test_mds[(test_mds['DayIndex'] < 400)].copy(deep=True)
+    fin = test_mds['DayIndex'].max()
+    test_mds = test_mds[test_mds['DayIndex'] >= fin - 400].copy(deep=True)
     y_guess = pca_svm_cv_guess(train_mds)
     test_mds['y_guess'] = y_guess
     # Convert 0 to -1 for shorting
@@ -111,7 +109,8 @@ def draw_pca_svm_cv(train_mds, test_mds):
 def draw_nn(train_mds, test_mds, type):
     mkt_names = list(train_mds.Market.unique())
     pnls = []
-    test_mds = test_mds[(test_mds['DayIndex'] < 400)].copy(deep=True)
+    fin = test_mds['DayIndex'].max()
+    test_mds = test_mds[test_mds['DayIndex'] >= fin - 400].copy(deep=True)
     y_guess = nn_acc(train_mds, type) 
     test_mds['y_guess'] = y_guess[:, 1]
     # Convert 0 to -1 for shorting

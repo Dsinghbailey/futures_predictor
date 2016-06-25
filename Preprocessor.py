@@ -25,7 +25,6 @@ def get_mds():
 
     # Sort
     mds = mds.sort_values(by=['Market', 'Date'])
-
     '''Carry forward data when there is a holiday by reindexing dataframe
     according to market with most dates'''
     # Get lookup table for dates and market index
@@ -38,7 +37,6 @@ def get_mds():
     all_dates.set_index(['Date2Num'], drop=False, inplace=True)
     all_dates = all_dates['index']
     all_dates = all_dates.to_dict()
-
     # Apply lookup table across df
     mds.set_index(['Date'], drop=False, inplace=True)
     mds['DayIndex'] = [time.mktime(date.timetuple()) for date in mds.Date]
@@ -46,7 +44,6 @@ def get_mds():
 
     # Drop dates not contained in lookup
     mds = mds[mds['DayIndex'] < 20000]
-
     # Get master index
     mkt_names = list(mds.Market.unique())
     mds['MasterIndex'] = mds['DayIndex'] + len(all_dates)*mds.Market.map(lambda x : mkt_names.index(x))
