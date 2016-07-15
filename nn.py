@@ -7,6 +7,8 @@ import time
 from Preprocessor import validation_split
 
 
+# Creates models for NN's using keras functional api
+# Returns Model
 def create_model(input_size, type):
     # Simple 2 layer nn
     if type == '2layer':
@@ -71,6 +73,7 @@ def create_model(input_size, type):
     return model
 
 
+# Train NN on dataset
 # Print accuracy, return guess
 def nn_acc(mds, type, epoch=5, batch=16):
     train, validation = validation_split(mds)
@@ -101,7 +104,9 @@ def nn_acc(mds, type, epoch=5, batch=16):
     return guess_validation
 
 
-# Print accuracy return guess
+# Train NN on dataset after whitening and performing PCA
+# with components = 8, the ideal number from svms
+# Print accuracy, return guess
 def pca_nn_acc(mds, type):
     train, validation = validation_split(mds)
     # Multiply by 1 to convert to bool
@@ -132,6 +137,8 @@ def pca_nn_acc(mds, type):
     return guess_validation
 
 
+# Train NN on dataset after whitening and performing PCA
+# with components = features so data is not lost
 # Print accuracy return guess
 def feature_scaled_nn_acc(mds, type):
     train, validation = validation_split(mds)

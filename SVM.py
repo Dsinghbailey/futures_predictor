@@ -6,6 +6,8 @@ from sklearn.grid_search import GridSearchCV
 from Preprocessor import validation_split
 
 
+# Implements an SVM with and rbf kernel on market data
+# Returns train and validation set accuracy
 def svm_acc(mds, kernel):
     train, validation = validation_split(mds)
     y_train = train['Up']
@@ -23,6 +25,8 @@ def svm_acc(mds, kernel):
     return train_acc, validation_acc
 
 
+# Implements an SVM with and rbf kernel on each market
+# Returns train and validation set accuracies in a list
 def batch_svm_acc(mds, kernel):
     mkt_names = list(mds.Market.unique())
     acc_scores = []
@@ -34,6 +38,9 @@ def batch_svm_acc(mds, kernel):
     return acc_scores
 
 
+# Implements an SVM with and rbf kernel on each market
+# Includes grid search of complexity
+# Returns train and validation set accuracies in a list
 def gridsearch_svm(mds):
     mkt_names = list(mds.Market.unique())
     acc_scores = []

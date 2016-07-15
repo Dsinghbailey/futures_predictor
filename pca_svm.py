@@ -6,6 +6,9 @@ from sklearn.pipeline import Pipeline
 from Preprocessor import validation_split
 
 
+# Implements an SVM with an rbf kernel on market data
+# PCA is performed on data beforehand
+# Returns train and validation set accuracy
 def pca_svm_acc(mds):
     train, validation = validation_split(mds)
     y_train = train['Up']
@@ -26,6 +29,9 @@ def pca_svm_acc(mds):
     return train_acc, validation_acc
 
 
+# Implements an SVM with and rbf kernel on each market
+# PCA is performed on data beforehand
+# Returns train and validation set accuracies in a list
 def batch_pca_svm_acc(mds):
     mkt_names = list(mds.Market.unique())
     acc_scores = []
@@ -38,6 +44,9 @@ def batch_pca_svm_acc(mds):
     return acc_scores
 
 
+# Implements an SVM with an rbf kernel on market data
+# PCA is performed on data with gridsearch 
+# Returns train and validation set accuracy
 def pca_svm_cv_acc(mds):
     train, validation = validation_split(mds)
     y_train = train['Up']

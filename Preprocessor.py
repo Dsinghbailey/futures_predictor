@@ -8,21 +8,16 @@ from datetime import datetime
 def get_mds():
     # Read
     mds = pd.read_csv('DailySummaries.csv')
-
     # Select columns
     mds = mds[['Date', 'Market', 'Open', 'High',
                'Low', 'Close', 'Volume', 'ATR10']]
-
     # Drop some markets
     mds = mds[(mds['Market'] != 'VX') & (mds['Market'] != 'FOAT')]
-
     # Reformat Date
     mds['Date'] = mds['Date'].map(lambda x: datetime.strptime(x, '%m/%d/%Y'))
-
     # Limit date
     mds = mds[mds['Date'] > datetime(2006, 1, 1)]
     mds = mds[mds['Date'] < datetime(2016, 1, 1)]
-
     # Sort
     mds = mds.sort_values(by=['Market', 'Date'])
     '''Carry forward data when there is a holiday by reindexing dataframe
@@ -41,7 +36,6 @@ def get_mds():
     mds.set_index(['Date'], drop=False, inplace=True)
     mds['DayIndex'] = [time.mktime(date.timetuple()) for date in mds.Date]
     mds['DayIndex'] = mds['DayIndex'].replace(all_dates)
-
     # Drop dates not contained in lookup
     mds = mds[mds['DayIndex'] < 20000]
     # Get master index
@@ -63,7 +57,6 @@ def get_mds():
 # Simple market daily summaries for graphing
 def get_simple_mds():
     mds = get_mds()
-
     # Select Columns and return
     mds = mds[['Market', 'DayIndex', 'Open', 'High', 'Low', 'Close', 'Volume']]
     return mds

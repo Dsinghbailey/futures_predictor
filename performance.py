@@ -9,7 +9,7 @@ from nn import nn_acc
 from Preprocessor import validation_split
 
 
-# Helper
+# Helper function to draw eq_curve
 def draw_eq_curve(mkt, eq_curve):
     # Graph
     fig = plt.figure()
@@ -105,7 +105,7 @@ def draw_pca_svm_cv(train_mds, test_mds):
     print "\naverage PNL %s" % np.mean(pnls)
 
 
-# nn
+# Equity curves for neural nets
 def draw_nn(train_mds, test_mds, type):
     mkt_names = list(train_mds.Market.unique())
     pnls = []

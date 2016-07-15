@@ -3,6 +3,8 @@ from sklearn.metrics import accuracy_score
 from Preprocessor import validation_split
 
 
+# Implements a random forest on marketdata
+# returns accuracy score for train and validation sets
 def random_forest_acc(mds):
     train, validation = validation_split(mds)
     y_train = train['Up']
@@ -21,6 +23,8 @@ def random_forest_acc(mds):
     return train_acc, validation_acc
 
 
+# Implements a random forest on each individual markets 
+# returns accuracy scores for train and validation sets in a list
 def batch_random_forest_acc(mds):
     mkt_names = list(mds.Market.unique())
     acc_scores = []

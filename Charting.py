@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+# Function for drawing Candlesticks from simple mds
 def draw_mkt_chart(mkt, mktdata):
     # Get data and format
     mktdata = mktdata[mktdata['Market'] == mkt]
@@ -22,6 +23,7 @@ def draw_mkt_chart(mkt, mktdata):
     plt.show()
 
 
+# Function for drawing histograms from simple mds
 def draw_mkt_histo(mkt, mktdata):
     # Get data and format
     mktdata = mktdata[mktdata['Market'] == mkt]
